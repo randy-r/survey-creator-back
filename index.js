@@ -3,6 +3,9 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const surveysRouter = require('./routes/surveys');
 const questionnaireRouter = require('./routes/questionnaires');
+const itemsRouter = require('./routes/items');
+const fakeQuestionnaireRouter = require('./routes/fake-questionnaires');
+const answerTemplatesRouter = require('./routes/answer-templates');
 const { connectToDB } = require('./repos/db');
 
 connectToDB(() => {
@@ -25,6 +28,10 @@ connectToDB(() => {
 
   app.use('/surveys', surveysRouter)
   app.use('/questionnaires', questionnaireRouter)
+  app.use('/items', itemsRouter)
+  app.use('/fakequestionnaires', fakeQuestionnaireRouter)
+  // app.use('/trickItems', trickItemsRouter)
+  app.use('/answertemplates', answerTemplatesRouter)
 
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
