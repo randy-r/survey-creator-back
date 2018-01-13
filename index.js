@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const surveysRouter = require('./routes/surveys');
+const questionnaireRouter = require('./routes/questionnaires');
 const { connectToDB } = require('./repos/db');
 
 connectToDB(() => {
@@ -23,6 +24,7 @@ connectToDB(() => {
   });
 
   app.use('/surveys', surveysRouter)
+  app.use('/questionnaires', questionnaireRouter)
 
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
