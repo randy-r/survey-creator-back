@@ -5,6 +5,7 @@ const surveysRouter = require('./routes/surveys');
 const questionnaireRouter = require('./routes/questionnaires');
 const itemsRouter = require('./routes/items');
 const fakeQuestionnaireRouter = require('./routes/fake-questionnaires');
+const trickItemsRouter = require('./routes/trick-items')
 const answerTemplatesRouter = require('./routes/answer-templates');
 const { connectToDB } = require('./repos/db');
 
@@ -30,7 +31,7 @@ connectToDB(() => {
   app.use('/questionnaires', questionnaireRouter)
   app.use('/items', itemsRouter)
   app.use('/fakequestionnaires', fakeQuestionnaireRouter)
-  // app.use('/trickItems', trickItemsRouter)
+  app.use('/trickitems', trickItemsRouter)
   app.use('/answertemplates', answerTemplatesRouter)
 
   // The "catchall" handler: for any request that doesn't
