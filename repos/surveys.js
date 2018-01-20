@@ -1,5 +1,8 @@
+const { ObjectID } = require('mongodb');
+
 const { provideDB } = require('./db');
 const { adjustObjectId } = require('./utils');
+
 
 const collName = 'surveys';
 const aoid = adjustObjectId;
@@ -23,6 +26,14 @@ exports.getAll = callback => {
       console.log(results)
       callback(results.map(s => aoid(s)))
     })
+    .catch(x => console.log('error', x)
+    );
+}
+
+exports.getById = (id, callback) => {
+  const db = provideDB();
+  db.collection(collName).findOne({ _id: new ObjectID(id) })
+    .then(result => callback(result))
     .catch(x => console.log('error', x)
     );
 }
