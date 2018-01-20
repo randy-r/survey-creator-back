@@ -27,18 +27,23 @@ connectToDB(() => {
     console.log(`Sent foos.`);
   });
 
-  app.use('/surveys', surveysRouter)
-  app.use('/questionnaires', questionnaireRouter)
-  app.use('/items', itemsRouter)
-  app.use('/fakequestionnaires', fakeQuestionnaireRouter)
-  app.use('/trickitems', trickItemsRouter)
-  app.use('/answertemplates', answerTemplatesRouter)
+  app.use('/api/surveys', surveysRouter)
+  app.use('/api/questionnaires', questionnaireRouter)
+  app.use('/api/items', itemsRouter)
+  app.use('/api/fakequestionnaires', fakeQuestionnaireRouter)
+  app.use('/api/trickitems', trickItemsRouter)
+  app.use('/api/answertemplates', answerTemplatesRouter)
 
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
-  app.get('*', (req, res) => {
-    console.log('*');
-    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+  app.get('/admin/*', (req, res) => {
+    console.log('/admin/*');
+    res.sendFile(path.join(__dirname + '/client/build/admin/index.html'));
+  });
+
+  app.get('/user/*', (req, res) => {
+    console.log('/user/*');
+    res.sendFile(path.join(__dirname + '/client/build/user/index.html'));
   });
 
   const port = process.env.PORT || 5111;
