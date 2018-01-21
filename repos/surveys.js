@@ -33,7 +33,7 @@ exports.getAll = callback => {
 exports.getById = (id, callback) => {
   const db = provideDB();
   db.collection(collName).findOne({ _id: new ObjectID(id) })
-    .then(result => callback(result))
+    .then(result => callback(aoid(result)))
     .catch(x => console.log('error', x)
     );
 }
