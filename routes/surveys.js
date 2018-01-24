@@ -16,10 +16,33 @@ router.post('/', function (req, res) {
 
 router.get('/', function (req, res) {
   getAll(all => res.json(all));
-})
+});
 
 router.get('/:id', (req, res) => {
   getById(req.params.id, entity => res.json(entity));
+});
+
+router.get('/:id/take-shape', (req, res) => {
+  getById(req.params.id, entity => {
+    // randomly choose one of the two FQs
+    const { questionaresIDsAndTypes } = entity;
+    const fakes = questionaresIDsAndTypes.filter(info => info.type === 'fake');
+    // by convention, first is rational
+    const chosenIndex = Math.random() < 0.5 ? 0 : 1;
+    const fakeToShow = fakes[chosenIndex];
+    const newQIDsAndTypes = questionaresIDsAndTypes.filter(info => {
+      if(info.type === 'valid'){
+        return true;
+      }
+      if(info === fakeToShow){
+        return true;
+      }
+      return false;
+    });
+    entity.questionaresIDsAndTypes = newQIDsAndTypes;
+    entity.rational = chosenIndex === 0;
+    res.json(entity)
+  });
 });
 
 module.exports = router

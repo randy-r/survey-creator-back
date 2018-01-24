@@ -11,7 +11,7 @@ const fakeQuestionnaireRouter = require('./routes/fake-questionnaires');
 const trickItemsRouter = require('./routes/trick-items')
 const answerTemplatesRouter = require('./routes/answer-templates');
 const surveySessionRouter = require('./routes/survey-session');
-const { connectToDB } = require('./repos/db');
+const { connectToDB, provideDB } = require('./repos/db');
 
 // mongodb service needs to be started beforehand
 // $ sudo service mongod start
@@ -27,9 +27,9 @@ connectToDB(() => {
   app.use(ejwt({
     secret: getJwtSecret(),
     credentialsRequired: false,
-    getToken: function fromHeaderOrQuerystring (req) {
+    getToken: function fromHeaderOrQuerystring(req) {
       if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-          return req.headers.authorization.split(' ')[1];
+        return req.headers.authorization.split(' ')[1];
       } else if (req.query && req.query.token) {
         return req.query.token;
       }
@@ -75,6 +75,25 @@ connectToDB(() => {
   const port = process.env.PORT || 5111;
   app.listen(port);
 
-  console.log(`Express server listening on ${port}`);
+  console.log(`Express server listening on ${port}.`);
 
 });
+
+
+process.stdin.resume();//so the program will not close instantly
+
+function exitHandler(options, err) {
+  if (options.cleanup) console.log('Clean exit performed.');
+  if (err) console.log(err.stack);
+  if (options.exit) process.exit();
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null, { cleanup: true }));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
+process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, { exit: true }));

@@ -1,3 +1,4 @@
+
 const { ObjectID } = require('mongodb');
 
 const { provideDB } = require('./db');
@@ -11,6 +12,8 @@ exports.createSurvey = (survey, callback) => {
   // this is a frontend presentation concern how it would display a survey at that ID
   // survey.participantUrl = 'something';
   const db = provideDB();
+  const { questionaresIDsAndTypes } = survey;
+  questionaresIDsAndTypes.forEach(e => e.id = new ObjectID(e.id));
 
   db.collection(collName).insert(survey)
     .then(result => callback(aoid(result.ops[0])))

@@ -12,4 +12,13 @@ router.post('/begin-survey-session', function (req, res) {
   res.json(token);
 })
 
+
+router.post('/end-survey-session', function (req, res) {
+  const body = req.body;
+  console.log('end session data: ', body);
+  const { allItemAnswers} = body;
+  const user = req.user;
+  res.json({ done: true });
+})
+
 module.exports = router;
