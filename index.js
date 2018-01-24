@@ -13,6 +13,8 @@ const answerTemplatesRouter = require('./routes/answer-templates');
 const surveySessionRouter = require('./routes/survey-session');
 const { connectToDB } = require('./repos/db');
 
+// mongodb service needs to be started beforehand
+// $ sudo service mongod start
 connectToDB(() => {
   const app = express();
 

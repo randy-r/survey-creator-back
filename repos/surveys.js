@@ -8,7 +8,8 @@ const collName = 'surveys';
 const aoid = adjustObjectId;
 
 exports.createSurvey = (survey, callback) => {
-  survey.participantUrl = 'something';
+  // this is a frontend presentation concern how it would display a survey at that ID
+  // survey.participantUrl = 'something';
   const db = provideDB();
 
   db.collection(collName).insert(survey)
