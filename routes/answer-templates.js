@@ -6,6 +6,12 @@ const {
 
 const router = express.Router()
 
+
+router.use(function (req, res, next) {
+  // TODO req.user - isAdmin check
+  next()
+});
+
 router.post('/', function (req, res) {
   const body = req.body
   console.log(body);
