@@ -20,8 +20,10 @@ router.get('/', function (req, res) {
 
 
 router.get('/:id', (req, res) => {
-  const {id } = req.params;
-  if (req.user && req.user.survey.questionaresIDsAndTypes.find(v => v.id === id)) {
+  const { id } = req.params;
+  if (req.user.isAdmin) {
+    getById(id, entity => res.json(entity));
+  } else if (req.user && req.user.survey.questionaresIDsAndTypes.find(v => v.id === id)) {
     getById(id, entity => res.json(entity));
   } else {
     res.status(401).send(`Your survey session does not contain the questionnaire at id ${id}.`);

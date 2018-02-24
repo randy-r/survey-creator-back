@@ -59,7 +59,8 @@ router.get('/oauthcallback', (req, res) => {
           const dbCallback = user => {
             // create application specific jwt and redirect
             const tokenContent = {
-              emailAddress
+              emailAddress,
+              isAdmin: true,
             };
             const token = jwt.sign(tokenContent, getJwtSecret());
             res.redirect(`/setsession/${token}`);

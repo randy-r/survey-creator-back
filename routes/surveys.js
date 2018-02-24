@@ -2,7 +2,8 @@ const express = require('express')
 const {
   createSurvey,
   getAll,
-  getById
+  getById,
+  getByIdWithQs
 } = require('../repos/surveys');
 
 const router = express.Router()
@@ -19,7 +20,15 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:id', (req, res) => {
-  getById(req.params.id, entity => res.json(entity));
+  const { id } = req.params;
+  const { includeQuestionnaires } = req.query;
+  const callback = survey => res.json(survey);
+
+  if (req.query.includeQuestionnaires === 'true') {
+    getByIdWithQs(id, callback);
+    return;
+  }
+  getById(id, callback);
 });
 
 router.get('/:id/take-shape', (req, res) => {
@@ -31,10 +40,10 @@ router.get('/:id/take-shape', (req, res) => {
     const chosenIndex = Math.random() < 0.5 ? 0 : 1;
     const fakeToShow = fakes[chosenIndex];
     const newQIDsAndTypes = questionaresIDsAndTypes.filter(info => {
-      if(info.type === 'valid'){
+      if (info.type === 'valid') {
         return true;
       }
-      if(info === fakeToShow){
+      if (info === fakeToShow) {
         return true;
       }
       return false;

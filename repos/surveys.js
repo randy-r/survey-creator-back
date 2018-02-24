@@ -32,7 +32,7 @@ exports.getAll = callback => {
     })
     .catch(x => console.log('error', x)
     );
-}
+};
 
 exports.getById = (id, callback) => {
   const db = provideDB();
@@ -40,4 +40,90 @@ exports.getById = (id, callback) => {
     .then(result => callback(aoid(result)))
     .catch(x => console.log('error', x)
     );
+};
+
+exports.getByIdWithQs = (id, callback) => {
+  const db = provideDB();
+
+  db.collection(collName)
+    .aggregate([
+      {
+        $match: { _id: new ObjectID(id) }
+      },
+      {
+        $lookup: {
+          from: 'questionneres',
+          localField: 'questionaresIDsAndTypes.id',
+          foreignField: '_id',
+          as: 'qs'
+        },
+      },
+      {
+        $lookup: {
+          from: 'fakequestionneres',
+          localField: 'questionaresIDsAndTypes.id',
+          foreignField: '_id',
+          as: 'fqs'
+        },
+      },
+      {
+        $project: {
+          aqs: { $concatArrays: ["$qs", "$fqs"] },
+          name: "$name",
+          adminId: "$adminId",
+          questionaresIDsAndTypes: "$questionaresIDsAndTypes",
+        }
+      },
+      {
+        $unwind: {
+          path: "$aqs",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'items',
+          localField: 'aqs.itemsIds',
+          foreignField: '_id',
+          as: 'aqs.items'
+        },
+      },
+      {
+        $lookup: {
+          from: 'trickitems',
+          localField: 'aqs.trickitemsIds',
+          foreignField: '_id',
+          as: 'aqs.trickitems'
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $first: "$name" },
+          adminId: { $first: "$adminId" },
+          questionaresIDsAndTypes: { $first: "$questionaresIDsAndTypes" },
+          allQuestionnaires: { $push: "$aqs" },
+        }
+      }
+    ]) // aggregate
+    .toArray()
+    .then(array => {
+      if (array.length === 0) {
+        callback(null);
+        return;
+      }
+      const survey = array[0];
+      const { questionaresIDsAndTypes, allQuestionnaires } = survey;
+      // logic to provide the Qs in the correct order, maybe consider this in refactoring the collections
+      const idToIndex = new Map();
+      questionaresIDsAndTypes.forEach(({ id }, i) => { idToIndex.set(id.toString(), i); });
+      const reordered = new Array(allQuestionnaires.length);
+      allQuestionnaires.forEach(({ _id }, i) => { reordered[idToIndex.get(_id.toString())] = allQuestionnaires[i] });
+
+      survey.allQuestionnaires = reordered;
+      callback(aoid(survey))
+    })
+    .catch(e => {
+      console.error(e);
+    })
 }
