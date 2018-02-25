@@ -45,10 +45,13 @@ connectToDB(() => {
           '/api/foo', '/begin-survey-session',
           '/oauthcallback',
           /^\/setsession\/.*/,
+          /^\/api\/surveys\/.*\/take-shape/,
           /^\/user\/.*/,
           /^\/admin\/.*/,
           '/login',
           '/login/',
+          '/api/begin-survey-session',
+          '/api/begin-survey-session/',
         ]
       })
   );

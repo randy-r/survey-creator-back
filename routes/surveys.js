@@ -9,9 +9,11 @@ const {
 const router = express.Router()
 
 router.post('/', function (req, res) {
-  const body = req.body
-  console.log(body);
-  createSurvey(body, createdSurvey => res.json(createdSurvey))
+  const surveyData = req.body
+  const { emailAddress } = req.user;
+  console.log(surveyData);
+  surveyData.adminEmail = emailAddress;
+  createSurvey(surveyData, createdSurvey => res.json(createdSurvey))
   console.log('Created survey.');
 })
 

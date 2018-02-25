@@ -68,15 +68,16 @@ exports.getByIdWithQs = (id, callback) => {
       },
       {
         $project: {
-          aqs: { $concatArrays: ["$qs", "$fqs"] },
-          name: "$name",
-          adminId: "$adminId",
-          questionaresIDsAndTypes: "$questionaresIDsAndTypes",
+          aqs: { $concatArrays: ['$qs', '$fqs'] },
+          name: '$name',
+          adminEmail: '$adminEmail',
+          questionaresIDsAndTypes: '$questionaresIDsAndTypes',
+          followUpInfo: '$followUpInfo',
         }
       },
       {
         $unwind: {
-          path: "$aqs",
+          path: '$aqs',
           preserveNullAndEmptyArrays: true
         }
       },
@@ -98,11 +99,12 @@ exports.getByIdWithQs = (id, callback) => {
       },
       {
         $group: {
-          _id: "$_id",
-          name: { $first: "$name" },
-          adminId: { $first: "$adminId" },
-          questionaresIDsAndTypes: { $first: "$questionaresIDsAndTypes" },
-          allQuestionnaires: { $push: "$aqs" },
+          _id: '$_id',
+          name: { $first: '$name' },
+          adminEmail: { $first: '$adminEmail' },
+          questionaresIDsAndTypes: { $first: '$questionaresIDsAndTypes' },
+          followUpInfo: { $first: '$followUpInfo' },
+          allQuestionnaires: { $push: '$aqs' },
         }
       }
     ]) // aggregate

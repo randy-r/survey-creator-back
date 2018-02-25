@@ -1,6 +1,9 @@
 exports.getJwtSecret = () => process.env.JWT_SECRET;
 
-
+exports.CLIENT_ID = process.env.CLIENT_ID;
+exports.CLIENT_SECRET = process.env.CLIENT_SECRET;
+exports.REDIRECT_URL = `${process.env.HOST}/oauthcallback`;
+exports.SURVEY_URL = `${process.env.HOST}/take-survey`;
 
 
 // not used yet, but saving it in the code base

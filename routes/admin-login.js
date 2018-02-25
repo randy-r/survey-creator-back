@@ -2,17 +2,13 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { getAdminUser, updateAdminUser } = require('../repos/admin-user');
 const { sendEmail } = require('../utils/emails');
-const { getJwtSecret } = require('../utils/auth');
+const { getJwtSecret, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL } = require('../utils/auth');
 
 const btoa = require('btoa');
 
 const google = require('googleapis');
 
 const OAuth2 = google.auth.OAuth2;
-
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URL = `${process.env.HOST}/oauthcallback`;
 
 
 const scopes = [

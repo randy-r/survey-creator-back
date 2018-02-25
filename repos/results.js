@@ -9,6 +9,7 @@ const aoid = adjustObjectId;
 const convertIdsToObjectIds = survey => {
   return {
     id: new ObjectID(survey.id),
+    rational: survey.rational,
     questionnaires: survey.questionnaires.map(q => {
       return {
         id: new ObjectID(q.id),
@@ -26,14 +27,16 @@ const convertIdsToObjectIds = survey => {
 exports.saveSurveyEntry = (entry, callback) => {
   const db = provideDB();
   const { user, survey } = entry;
+  const mappedSurvey = convertIdsToObjectIds(survey);
   // prefetch at provided e-mail
   // TODO might want to use the 'upsert' option on findOneAndUpdate
+
   db.collection(collName).findOneAndUpdate(
     {
       email: user.email
     },
     {
-      $push: { surveys: survey }
+      $push: { surveys: mappedSurvey }
     },
     {
       returnOriginal: false
@@ -42,9 +45,7 @@ exports.saveSurveyEntry = (entry, callback) => {
       if (updatedResult === null) {
         const toInsert = {
           ...user,
-          surveys: [
-            convertIdsToObjectIds(survey)
-          ]
+          surveys: [mappedSurvey]
         };
         db.collection(collName).insert(toInsert)
           .then(r => {
