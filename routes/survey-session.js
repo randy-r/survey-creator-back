@@ -116,9 +116,6 @@ router.post('/end-survey-session', function (req, res) {
   saveSurveyEntry(surveyEntry, () => {
     res.json({});
   });
-  res.json({});
-
-
 })
 
 module.exports = router;
