@@ -1,3 +1,4 @@
+
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -14,11 +15,13 @@ const answerTemplatesRouter = require('./routes/answer-templates');
 const surveySessionRouter = require('./routes/survey-session');
 const adminLoginRouter = require('./routes/admin-login');
 const { connectToDB, provideDB } = require('./repos/db');
+const { registerAllFollowUpEmailJobs } = require('./routes/emailer');
 
 
 // mongodb service needs to be started beforehand
 // $ sudo service mongod start
 connectToDB(() => {
+  registerAllFollowUpEmailJobs();
   const app = express();
 
   // Serve static files from the React app

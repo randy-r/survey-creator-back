@@ -7,9 +7,9 @@ const collName = 'results';
 const aoid = adjustObjectId;
 
 const convertIdsToObjectIds = survey => {
+  const { id, questionnaires, ...rest } = survey;
   return {
     id: new ObjectID(survey.id),
-    rational: survey.rational,
     questionnaires: survey.questionnaires.map(q => {
       return {
         id: new ObjectID(q.id),
@@ -20,7 +20,8 @@ const convertIdsToObjectIds = survey => {
           }
         })
       }
-    })
+    }),
+    ...rest,
   }
 }
 
