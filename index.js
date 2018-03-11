@@ -14,6 +14,7 @@ const trickItemsRouter = require('./routes/trick-items')
 const answerTemplatesRouter = require('./routes/answer-templates');
 const surveySessionRouter = require('./routes/survey-session');
 const adminLoginRouter = require('./routes/admin-login');
+const resultsRouter = require('./routes/results');
 const { connectToDB, provideDB } = require('./repos/db');
 const { registerAllFollowUpEmailJobs } = require('./routes/emailer');
 
@@ -55,6 +56,7 @@ connectToDB(() => {
           '/login/',
           '/api/begin-survey-session',
           '/api/begin-survey-session/',
+          '/api/results'          
         ]
       })
   );
@@ -82,6 +84,7 @@ connectToDB(() => {
   app.use('/api/trickitems', trickItemsRouter)
   app.use('/api/answertemplates', answerTemplatesRouter)
   app.use('/api', surveySessionRouter)
+  app.use('/api/results', resultsRouter)
 
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.

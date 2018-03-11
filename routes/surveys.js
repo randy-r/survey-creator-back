@@ -38,20 +38,28 @@ router.get('/:id/take-shape', (req, res) => {
     // randomly choose one of the two FQs
     const { questionaresIDsAndTypes } = entity;
     const fakes = questionaresIDsAndTypes.filter(info => info.type === 'fake');
-    // by convention, first is rational
-    const chosenIndex = Math.random() < 0.5 ? 0 : 1;
-    const fakeToShow = fakes[chosenIndex];
-    const newQIDsAndTypes = questionaresIDsAndTypes.filter(info => {
-      if (info.type === 'valid') {
-        return true;
-      }
-      if (info === fakeToShow) {
-        return true;
-      }
-      return false;
-    });
-    entity.questionaresIDsAndTypes = newQIDsAndTypes;
-    entity.rational = chosenIndex === 0;
+
+    if (fakes.length === 2) {
+      // by convention, first is rational
+      const chosenIndex = Math.random() < 0.5 ? 0 : 1;
+      const fakeToShow = fakes[chosenIndex];
+      const newQIDsAndTypes = questionaresIDsAndTypes.filter(info => {
+        if (info.type === 'valid') {
+          return true;
+        }
+        if (info === fakeToShow) {
+          return true;
+        }
+        return false;
+      });
+      entity.questionaresIDsAndTypes = newQIDsAndTypes;
+      entity.rational = chosenIndex === 0;
+    } else if (fakes.length === 0) {
+      entity.rational = null;
+    } else {
+      throw new Error(`Invalid fake questionare number: ${fakes.length}!`);
+    }
+
     res.json(entity)
   });
 });

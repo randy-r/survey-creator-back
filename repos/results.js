@@ -75,4 +75,41 @@ exports.getAll = callback => {
     })
     .catch(x => console.log('error', x)
     );
-}
+};
+
+exports.getAllAtSurveyIds = ids => {
+  const db = provideDB();
+
+  const objectids = ids.map(id => new ObjectID(id));
+
+  return db.collection(collName)
+    .aggregate([
+      {
+        $unwind: {
+          path: '$surveys',
+        }
+      },
+      {
+        $match: {
+          "surveys.id": { $in: objectids }
+        }
+      },
+      {
+        $project: {
+          survey: '$surveys',
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          age: 1,
+          gender: 1,
+        }
+      }
+    ]) // aggregate
+    .toArray()
+    .then(array => {
+      return array;
+    })
+    .catch(e => {
+      console.error(e);
+    })
+};
