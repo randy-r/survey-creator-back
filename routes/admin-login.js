@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { getAdminUser, updateAdminUser } = require('../repos/admin-user');
 const { sendEmail } = require('../utils/emails');
 const { getJwtSecret, CLIENT_ID, CLIENT_SECRET, REDIRECT_URL } = require('../utils/auth');
+const logger = require('../utils/logger');
 
 const btoa = require('btoa');
 
@@ -77,7 +78,6 @@ router.get('/oauthcallback', (req, res) => {
 }); // get('/oauthcallback'
 
 router.get('/login', (req, res) => {
-  console.log('/login');
   const oauth2Client = new OAuth2(
     CLIENT_ID,
     CLIENT_SECRET,
@@ -98,11 +98,11 @@ router.get('/login', (req, res) => {
 
 router.get('/setsession/:jwt', (req, res) => {
   const { jwt } = req.params;
-  console.log('/setsession/:jwt', jwt);
+  logger.info('/setsession/:jwt', jwt);
   res.send(
     `<script>
     window.onload = () => {
-      console.log('load');
+      console.log('onload');
       localStorage.setItem('access_token', '${jwt}');
       window.location = '/admin/';
     }

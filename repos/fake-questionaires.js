@@ -2,9 +2,11 @@ const { ObjectID } = require('mongodb');
 
 const { provideDB } = require('./db');
 const { adjustObjectId } = require('./utils');
+const logger = require('../utils/logger');
 
 const collName = 'fakequestionneres';
 const aoid = adjustObjectId;
+
 
 exports.create = (entity, callback) => {
   const db = provideDB();
@@ -14,7 +16,7 @@ exports.create = (entity, callback) => {
 
   db.collection(collName).insert(entity)
     .then(result => callback(aoid(result.ops[0])))
-    .catch(x => console.log('error', x)
+    .catch(x => logger.error('error', x)
     );
 };
 
@@ -24,10 +26,9 @@ exports.getAll = callback => {
   db.collection(collName).find({})
     .toArray()
     .then(results => {
-      console.log(results)
       callback(results.map(s => aoid(s)))
     })
-    .catch(x => console.log('error', x)
+    .catch(x => logger.error('error', x)
     );
 };
 
@@ -56,7 +57,7 @@ exports.getById = (id, callback) => {
       callback(aoid(array[0]))
     })
     .catch(e => {
-      console.error(e);
+      logger.error(e);
     })
     ;
 };

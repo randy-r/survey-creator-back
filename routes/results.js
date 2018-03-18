@@ -19,7 +19,6 @@ router.get('/', function (req, res) {
     res.status(400).send('Bad Request, This endpoint supports only one survey id and it should be rewritten. Eg: /api/results?sids[]=32.');
     return;
   }
-  console.log(sids);
 
   getAllAtSurveyIds(sids)
     .then(results => {
@@ -56,7 +55,6 @@ router.get('/', function (req, res) {
 
       Promise.all(promises)
         .then(values => {
-          console.log(values);
           const followUpSurveys = values.map(v => v ? v[0].survey : null); // first entry or null
           const trios = pairs.map((p, pi) => {
             const fuSurvey = followUpSurveys[pi];
@@ -87,8 +85,6 @@ router.get('/', function (req, res) {
           const json2csvParser = new Json2csvParser();
           const csv = json2csvParser.parse(rows);
 
-
-          console.log(csv);
           // the endpoint will always be called for one survey, so take the info only from the first entry
           const s_id = trios[0].result.survey.id;
           getById(s_id, theSurvey => {

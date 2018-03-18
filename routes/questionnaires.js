@@ -10,7 +10,6 @@ const router = express.Router()
 
 router.post('/', function (req, res) {
   const body = req.body
-  console.log(body);
   create(body, created => res.json(created))
 })
 

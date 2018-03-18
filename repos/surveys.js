@@ -3,6 +3,7 @@ const { ObjectID } = require('mongodb');
 
 const { provideDB } = require('./db');
 const { adjustObjectId } = require('./utils');
+const logger = require('../utils/logger');
 
 
 const collName = 'surveys';
@@ -17,7 +18,7 @@ exports.createSurvey = (survey, callback) => {
 
   db.collection(collName).insert(survey)
     .then(result => callback(aoid(result.ops[0])))
-    .catch(x => console.log('error', x)
+    .catch(x => loggers.error(x)
     );
 };
 
@@ -27,10 +28,9 @@ exports.getAll = callback => {
   db.collection(collName).find({})
     .toArray()
     .then(results => {
-      console.log(results)
       callback(results.map(s => aoid(s)))
     })
-    .catch(x => console.log('error', x)
+    .catch(x => logger.error(x)
     );
 };
 
@@ -38,7 +38,7 @@ exports.getById = (id, callback) => {
   const db = provideDB();
   db.collection(collName).findOne({ _id: new ObjectID(id) })
     .then(result => callback(aoid(result)))
-    .catch(x => console.log('error', x)
+    .catch(x => logger.error(x)
     );
 };
 
@@ -126,6 +126,6 @@ exports.getByIdWithQs = (id, callback) => {
       callback(aoid(survey))
     })
     .catch(e => {
-      console.error(e);
+      logger.error(e);
     })
 }

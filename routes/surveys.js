@@ -5,16 +5,15 @@ const {
   getById,
   getByIdWithQs
 } = require('../repos/surveys');
+const logger = require('../utils/logger');
 
 const router = express.Router()
 
 router.post('/', function (req, res) {
   const surveyData = req.body
   const { emailAddress } = req.user;
-  console.log(surveyData);
   surveyData.adminEmail = emailAddress;
   createSurvey(surveyData, createdSurvey => res.json(createdSurvey))
-  console.log('Created survey.');
 })
 
 router.get('/', function (req, res) {

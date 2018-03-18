@@ -2,6 +2,7 @@ const { ObjectID } = require('mongodb');
 
 const { provideDB } = require('./db');
 const { adjustObjectId } = require('./utils');
+const logger = require('../utils/logger');
 
 const collName = 'results';
 const aoid = adjustObjectId;
@@ -32,6 +33,7 @@ exports.saveSurveyEntry = (entry, callback) => {
   // prefetch at provided e-mail
   // TODO might want to use the 'upsert' option on findOneAndUpdate
 
+  // TODO check if there is already a survey in the result at that id and deny the new one 
   db.collection(collName).findOneAndUpdate(
     {
       email: user.email
@@ -53,11 +55,10 @@ exports.saveSurveyEntry = (entry, callback) => {
             callback(aoid(r.ops[0]))
           })
           .catch(x => {
-            console.log('error', x);
+            logger.error('error', x);
           });
       } else {
         // else: result is already updated
-        console.log(updatedResult.surveys);
         callback(aoid(updatedResult))
       }
     });
@@ -70,10 +71,9 @@ exports.getAll = callback => {
   db.collection(collName).find({})
     .toArray()
     .then(results => {
-      console.log(results)
       callback(results.map(s => aoid(s)))
     })
-    .catch(x => console.log('error', x)
+    .catch(x => logger.error(x)
     );
 };
 
@@ -110,6 +110,6 @@ exports.getAllAtSurveyIds = ids => {
       return array;
     })
     .catch(e => {
-      console.error(e);
+      logger.error(e);
     })
 };

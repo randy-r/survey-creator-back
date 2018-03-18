@@ -41,8 +41,6 @@ const mapToSurveyEntry = (user, questionnairesResults, followUpDate) => {
 
 router.post('/begin-survey-session', function (req, res) {
   const body = req.body;
-  console.log('begin session data: ', body);
-
   const token = jwt.sign(body, getJwtSecret());
   res.json(token);
 })

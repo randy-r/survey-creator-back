@@ -17,11 +17,14 @@ const adminLoginRouter = require('./routes/admin-login');
 const resultsRouter = require('./routes/results');
 const { connectToDB, provideDB } = require('./repos/db');
 const { registerAllFollowUpEmailJobs } = require('./routes/emailer');
+const logger = require('./utils/logger');
 
-
+logger.info('started process');
 // mongodb service needs to be started beforehand
 // $ sudo service mongod start
 connectToDB(() => {
+  logger.info('started process');
+
   registerAllFollowUpEmailJobs();
   const app = express();
 
@@ -56,7 +59,7 @@ connectToDB(() => {
           '/login/',
           '/api/begin-survey-session',
           '/api/begin-survey-session/',
-          '/api/results'          
+          '/api/results'
         ]
       })
   );
@@ -72,8 +75,6 @@ connectToDB(() => {
 
     // Return them as json
     res.json(['fooA', 'fooB']);
-
-    console.log(`Sent foos.`);
   });
 
   app.use('/', adminLoginRouter)
@@ -89,20 +90,18 @@ connectToDB(() => {
   // The "catchall" handler: for any request that doesn't
   // match one above, send back React's index.html file.
   app.get('/admin/*', (req, res) => {
-    console.log('/admin/*');
     // res.send('<h1>here</h1>');
     res.sendFile(path.join(__dirname + '/client/build/admin/index.html'));
   });
 
   app.get('/user/*', (req, res) => {
-    console.log('/user/*');
     res.sendFile(path.join(__dirname + '/client/build/user/index.html'));
   });
 
   const port = process.env.PORT || 5111;
   app.listen(port);
 
-  console.log(`Express server listening on ${port}.`);
+  logger.info(`Express server listening on ${port}.`);
 
 });
 
@@ -110,8 +109,11 @@ connectToDB(() => {
 process.stdin.resume();//so the program will not close instantly
 
 function exitHandler(options, err) {
-  if (options.cleanup) console.log('Clean exit performed.');
-  if (err) console.log(err.stack);
+  logger.info('Function exitHandler was called.')
+  if (options.cleanup) logger.info('Clean exit performed.');
+  if (err) {
+    logger.error(err.stack);
+  }
   if (options.exit) process.exit();
 }
 
@@ -123,4 +125,4 @@ process.on('SIGUSR1', exitHandler.bind(null, { exit: true }));
 process.on('SIGUSR2', exitHandler.bind(null, { exit: true }));
 
 //catches uncaught exceptions
-process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
+process.on('uncaughtException', exitHandler.bind(null, { exit: false }));

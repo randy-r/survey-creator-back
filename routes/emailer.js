@@ -9,6 +9,7 @@ const {
   REDIRECT_URL, SURVEY_URL } = require('../utils/auth');
 const resultsRepo = require('../repos/results');
 const surveysRepo = require('../repos/surveys');
+const logger = require('../utils/logger');
 
 const OAuth2 = google.auth.OAuth2;
 
@@ -32,11 +33,11 @@ exports.registerFollowUpEmailJob = (email, followUpDate, currentServeyId, follow
       };
 
       const j = scheduleJob(followUpDate, function () {
-        console.log('go job go.');
+        logger.info(`Registered job for sending email to ${mailObject.to} at the date ${followUpDate.toString()}`);
         sendEmail(oauth2Client, mailObject, (err, res) => {
-          if (err) console.error(err)
+          if (err) logger.error(`Failed at sending email to ${mailObject.to}.`, err);
           else {
-            console.log('send email ', res);
+            logger.info(`Successfully send email to ${mailObject.to}. Response`, res);
           }
         }); // sendEmail
       }); // scheduleJob
