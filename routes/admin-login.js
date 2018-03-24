@@ -90,6 +90,8 @@ router.get('/login', (req, res) => {
     // If you only need one scope you can pass it as a string
     scope: scopes,
 
+    approval_prompt: 'force',
+
     // Optional property that passes state parameters to redirect URI
     // state: 'foo'
   });
