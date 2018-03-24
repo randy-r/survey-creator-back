@@ -102,6 +102,7 @@ exports.getAllAtSurveyIds = ids => {
           email: 1,
           age: 1,
           gender: 1,
+          educationLevel: 1,
         }
       }
     ]) // aggregate

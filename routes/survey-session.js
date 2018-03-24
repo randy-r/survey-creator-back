@@ -15,6 +15,7 @@ const mapToSurveyEntry = (user, questionnairesResults, followUpDate) => {
     email,
     age,
     survey,
+    educationLevel,
   } = user;
 
   const { followUpInfo } = survey
@@ -26,6 +27,7 @@ const mapToSurveyEntry = (user, questionnairesResults, followUpDate) => {
       lastName,
       gender,
       age,
+      educationLevel,
     },
     survey: {
       id: survey.id,

@@ -55,7 +55,12 @@ router.get('/', function (req, res) {
 
       Promise.all(promises)
         .then(values => {
-          const followUpSurveys = values.map(v => v ? v[0].survey : null); // first entry or null
+          const followUpSurveys = values.map(v => {
+            if(v && v.length > 0) {
+              return v[0].survey; 
+            }
+            return null;
+          }); // first entry or null
           const trios = pairs.map((p, pi) => {
             const fuSurvey = followUpSurveys[pi];
             const ret = { ...p };
