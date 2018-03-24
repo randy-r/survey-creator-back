@@ -78,7 +78,10 @@ router.post('/end-survey-session', function (req, res) {
   const surveyEntry = mapToSurveyEntry(user, questionnairesResults, followUpDate);
 
   // the fake qs are not saved in the db
-  saveSurveyEntry(surveyEntry, () => {
+  saveSurveyEntry(surveyEntry, (_, err) => {
+    if(err){
+      res.status(403).send(err.msg);
+    }
     res.json({});
   });
 })

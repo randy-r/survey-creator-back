@@ -34,33 +34,47 @@ exports.saveSurveyEntry = (entry, callback) => {
   // TODO might want to use the 'upsert' option on findOneAndUpdate
 
   // TODO check if there is already a survey in the result at that id and deny the new one 
-  db.collection(collName).findOneAndUpdate(
-    {
-      email: user.email
-    },
-    {
-      $push: { surveys: mappedSurvey }
-    },
-    {
-      returnOriginal: false
-    }).then(r1 => {
-      const updatedResult = r1.value;
-      if (updatedResult === null) {
-        const toInsert = {
-          ...user,
-          surveys: [mappedSurvey]
-        };
-        db.collection(collName).insert(toInsert)
-          .then(r => {
-            callback(aoid(r.ops[0]))
-          })
-          .catch(x => {
-            logger.error('error', x);
-          });
+  db.collection(collName).findOne({
+    "surveys.id": mappedSurvey.id,
+    email: user.email,
+  })
+    .then(existing => {
+      if (existing) {
+        callback(null, { msg: `User ${user.email} already took the survey ${mappedSurvey.id}!` })
       } else {
-        // else: result is already updated
-        callback(aoid(updatedResult))
-      }
+        db.collection(collName).findOneAndUpdate(
+          {
+            email: user.email
+          },
+          {
+            $push: { surveys: mappedSurvey }
+          },
+          {
+            returnOriginal: false
+          }).then(r1 => {
+            const updatedResult = r1.value;
+            if (updatedResult === null) {
+              const toInsert = {
+                ...user,
+                surveys: [mappedSurvey]
+              };
+              db.collection(collName).insert(toInsert)
+                .then(r => {
+                  callback(aoid(r.ops[0]))
+                })
+                .catch(x => {
+                  logger.error('error', x);
+                });
+            } else {
+              // else: result is already updated
+              callback(aoid(updatedResult))
+            }
+          });
+
+      } // else
+    })
+    .catch(x => {
+      logger.error('error', x);
     });
 
 };

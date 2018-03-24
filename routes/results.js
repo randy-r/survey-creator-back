@@ -96,7 +96,6 @@ router.get('/', function (req, res) {
 
             const { name } = theSurvey;
             
-            // TODO survey name and date in filename
             const filename = `results-${name}-${new Date(Date.now()).toJSON()}.csv`;
             res.setHeader('Content-disposition', `attachment; filename=${filename}`);
             res.setHeader('Content-type', 'text/plain');
