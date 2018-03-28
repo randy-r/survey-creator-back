@@ -128,3 +128,11 @@ exports.getAllAtSurveyIds = ids => {
       logger.error(e);
     })
 };
+
+exports.getParticipantAtId = (id, callback) => {
+  const db = provideDB();
+  db.collection(collName).findOne({ _id: new ObjectID(id) })
+    .then(result => (result ? callback(aoid(result)) : callback(null)))
+    .catch(x => logger.error(x))
+    ;
+};

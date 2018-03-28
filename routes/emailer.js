@@ -15,7 +15,7 @@ const logger = require('../utils/logger');
 
 const OAuth2 = google.auth.OAuth2;
 
-exports.registerFollowUpEmailJob = (email, followUpDate, currentServeyId, followUpSurveyId) => {
+exports.registerFollowUpEmailJob = (email, userId, followUpDate, currentServeyId, followUpSurveyId) => {
   const oauth2Client = new OAuth2(
     CLIENT_ID,
     CLIENT_SECRET,
@@ -31,7 +31,7 @@ exports.registerFollowUpEmailJob = (email, followUpDate, currentServeyId, follow
       const mailObject = {
         to: email,
         subject: 'follow-up survey',
-        message: `Please follow the link to the next survey: ${SURVEY_URL}/${followUpSurveyId} .`
+        message: `Please follow the link to the next survey: ${SURVEY_URL}/${userId}/take-survey/${followUpSurveyId} .`
       };
 
       const j = scheduleJob(followUpDate, function () {
@@ -44,7 +44,7 @@ exports.registerFollowUpEmailJob = (email, followUpDate, currentServeyId, follow
             sendEmail(oauth2Client, mailObject, (err, res) => {
               if (err) logger.error(`Failed at sending email to ${mailObject.to}.`, err);
               else {
-                logger.info(`Successfully send email to ${mailObject.to}. Response`, res);
+                logger.info(`Successfully send email to ${mailObject.to}.`);
               }
             }); // sendEmail
           }); // updateAdminUser
@@ -59,11 +59,11 @@ exports.registerFollowUpEmailJob = (email, followUpDate, currentServeyId, follow
 exports.registerAllFollowUpEmailJobs = () => {
   resultsRepo.getAll(results => {
     results.forEach(r => {
-      const { email, surveys } = r;
+      const { email, surveys, id } = r;
       surveys.forEach(s => {
         const { followUpDateInfo } = s;
         if (followUpDateInfo && (followUpDateInfo.date > Date.now())) {
-          exports.registerFollowUpEmailJob(email, followUpDateInfo.date, s.id, followUpDateInfo.surveyId);
+          exports.registerFollowUpEmailJob(email, id.toString(), followUpDateInfo.date, s.id, followUpDateInfo.surveyId);
         }
       });
     });

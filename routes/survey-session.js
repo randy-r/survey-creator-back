@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
-const { saveSurveyEntry } = require('../repos/results');
+const { saveSurveyEntry, getParticipantAtId } = require('../repos/results');
 const { getJwtSecret } = require('../utils/auth');
 const { registerFollowUpEmailJob } = require('./emailer');
 
@@ -45,7 +45,19 @@ router.post('/begin-survey-session', function (req, res) {
   const body = req.body;
   const token = jwt.sign(body, getJwtSecret());
   res.json(token);
-})
+});
+
+router.get('/users/:userId', function (req, res) {
+  const { userId } = req.params;
+  getParticipantAtId(userId, participant => {
+    if (!participant) {
+      res.status(404).send('Participant not found');
+    } else {
+      const { firstName, lastName, email, gener, age, educationLevel, id } = participant;
+      res.json({ firstName, lastName, email, gener, age, educationLevel, id });
+    }
+  });
+});
 
 
 
@@ -57,7 +69,6 @@ router.post('/end-survey-session', function (req, res) {
   const { followUpInfo } = user.survey;
   let followUpDate = null;
   if (followUpInfo) {
-
     const { followUpMilliseconds } = followUpInfo;
     /*
     user.survey {
@@ -67,20 +78,20 @@ router.post('/end-survey-session', function (req, res) {
       rational:false
     }
     */
-
     // transform the offset into the actual date
     followUpDate = new Date(Date.now() + followUpMilliseconds);
-
-    // no real reason for waiting for the email job
-    registerFollowUpEmailJob(user.email, followUpDate, user.survey.id, followUpInfo.surveyId);
   }
 
   const surveyEntry = mapToSurveyEntry(user, questionnairesResults, followUpDate);
 
   // the fake qs are not saved in the db
-  saveSurveyEntry(surveyEntry, (_, err) => {
-    if(err){
+  saveSurveyEntry(surveyEntry, (entry, err) => {
+    if (err) {
       res.status(403).send(err.msg);
+    }
+    // no real reason for waiting for the email job
+    if (followUpInfo) {
+      registerFollowUpEmailJob(user.email, entry.id.toString(), followUpDate, user.survey.id, followUpInfo.surveyId);
     }
     res.json({});
   });

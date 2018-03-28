@@ -23,8 +23,6 @@ logger.info('started process');
 // mongodb service needs to be started beforehand
 // $ sudo service mongod start
 connectToDB(() => {
-  logger.info('started process');
-
   registerAllFollowUpEmailJobs();
   const app = express();
 
@@ -49,16 +47,17 @@ connectToDB(() => {
     })
       .unless({
         path: [
-          '/api/foo', '/begin-survey-session',
+          '/api/foo',
           '/oauthcallback',
           /^\/setsession\/.*/,
-          /^\/api\/surveys\/.*\/take-shape/,
           /^\/user\/.*/,
           /^\/admin\/.*/,
           '/login',
           '/login/',
           '/api/begin-survey-session',
           '/api/begin-survey-session/',
+          /^\/api\/users\/.*/,
+          /^\/api\/surveys\/.*\/take-shape/,
           '/api/results'
         ]
       })
