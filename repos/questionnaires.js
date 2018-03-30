@@ -15,7 +15,7 @@ exports.create = (entity, callback) => {
 
   db.collection(collName).insert(entity)
     .then(result => callback(aoid(result.ops[0])))
-    .catch(x => logger.error, x)
+    .catch(x => logger.error(x))
     ;
 };
 

@@ -73,6 +73,7 @@ exports.getByIdWithQs = (id, callback) => {
           adminEmail: '$adminEmail',
           questionaresIDsAndTypes: '$questionaresIDsAndTypes',
           followUpInfo: '$followUpInfo',
+          instructions: '$instructions',
         }
       },
       {
@@ -105,6 +106,7 @@ exports.getByIdWithQs = (id, callback) => {
           questionaresIDsAndTypes: { $first: '$questionaresIDsAndTypes' },
           followUpInfo: { $first: '$followUpInfo' },
           allQuestionnaires: { $push: '$aqs' },
+          instructions: { $first: '$instructions' },
         }
       }
     ]) // aggregate
