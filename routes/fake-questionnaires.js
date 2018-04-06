@@ -4,6 +4,7 @@ const {
   getAll,
   getById
 } = require('../repos/fake-questionaires');
+const shuffle = require('../utils/shuffle');
 
 const router = express.Router()
 
@@ -19,7 +20,13 @@ router.get('/', function (req, res) {
 });
 
 router.get('/:id', (req, res) => {
-  getById(req.params.id, entity => res.json(entity));
+  getById(req.params.id, entity => {
+    entity.trickitems.forEach(trickItem => {
+      const { answersPool, correctAnswersPool } = trickItem;
+      trickItem.allAnswersShuffled = shuffle(answersPool.concat(correctAnswersPool));
+    })
+    res.json(entity);
+  });
 });
 
 module.exports = router
