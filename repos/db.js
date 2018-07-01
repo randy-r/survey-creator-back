@@ -6,8 +6,7 @@ const logger = require('../utils/logger');
 let _db;
 let _client;
 
-exports.connectToDB = (callback) => {
-  const dbName = 'survey-creator';
+exports.connectToDB = (dbName, callback) => {
   MongoClient.connect('mongodb://localhost:27017', (err, client) => {
     if (err) throw new Error('Got error on mongo connection!')
     logger.info("Connected successfully to MongoDB server.");

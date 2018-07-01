@@ -30,6 +30,7 @@ exports.saveSurveyEntry = (entry, callback) => {
   const db = provideDB();
   const { user, survey } = entry;
   const mappedSurvey = convertIdsToObjectIds(survey);
+  mappedSurvey.dateTaken = new Date(Date.now());
   // prefetch at provided e-mail
   // TODO might want to use the 'upsert' option on findOneAndUpdate
 
@@ -136,3 +137,46 @@ exports.getParticipantAtId = (id, callback) => {
     .catch(x => logger.error(x))
     ;
 };
+
+exports.getFollowUpFor = (email, surveyId) => {
+  const db = provideDB();
+
+
+  return db.collection(collName)
+    .aggregate([
+      {
+        $unwind: {
+          path: '$surveys',
+        }
+      },
+      {
+        $match: {
+          "surveys.id": new ObjectID(surveyId),
+          "email": email
+        }
+      },
+      {
+        $project: {
+          survey: '$surveys',
+          firstName: 1,
+          lastName: 1,
+          email: 1,
+          age: 1,
+          gender: 1,
+          educationLevel: 1,
+        }
+      }
+    ]) // aggregate
+    .toArray()
+    .then(array => {
+      if (array.length > 1) {
+        throw new Error(`There are more than 1 results in db with email ${email} and taken survey id ${surveyId}!`);
+      } else if (array.length === 0) {
+        return null;
+      }
+      return array[0];
+    })
+    .catch(e => {
+      logger.error(e);
+    })
+}

@@ -1,7 +1,7 @@
 const express = require('express');
 const json2csv = require('json2csv');
 const {
-  getAllAtSurveyIds
+  getAllAtSurveyIds, getFollowUpFor
 } = require('../repos/results');
 const {
   getById
@@ -15,7 +15,7 @@ const Json2csvParser = json2csv.Parser;
 // this also gathers the follow up survey
 router.get('/', function (req, res) {
   const { sids } = req.query;
-  if (!sids || sids.length !== 1 ) {
+  if (!sids || sids.length !== 1) {
     res.status(400).send('Bad Request, This endpoint supports only one survey id and it should be rewritten. Eg: /api/results?sids[]=32.');
     return;
   }
@@ -32,12 +32,15 @@ router.get('/', function (req, res) {
         const { survey } = r;
         const { questionnaires } = survey;
 
+        const _acc = {
+          dateTake: new Date(survey.dateTaken)
+        };
         const flatSurvey = questionnaires.reduce((qacc, q, qidx) => {
           return q.items.reduce((itemacc, item, itemindex) => {
             itemacc[`survey-q-${qidx}/item-${itemindex}`] = item.answer;
             return itemacc;
           }, qacc);
-        }, {});
+        }, _acc);
 
         return ({
           result: r,
@@ -50,31 +53,32 @@ router.get('/', function (req, res) {
         if (!result.survey.followUpDateInfo) {
           return new Promise((resolve, reject) => resolve(null));
         }
-        return getAllAtSurveyIds([result.survey.followUpDateInfo.surveyId]);
+
+        // return getAllAtSurveyIds([result.survey.followUpDateInfo.surveyId]); this gets all participant results having taken the follow up at that id
+        return getFollowUpFor(result.email, result.survey.followUpDateInfo.surveyId);
       });
 
       Promise.all(promises)
         .then(values => {
-          const followUpSurveys = values.map(v => {
-            if(v && v.length > 0) {
-              return v[0].survey; 
-            }
-            return null;
-          }); // first entry or null
+          const followUpSurveys = values.map(v => (!!v) ? v.survey : null);
+
           const trios = pairs.map((p, pi) => {
             const fuSurvey = followUpSurveys[pi];
             const ret = { ...p };
             if (fuSurvey) {
+              const _acc = {
+                rationalFollowUp: fuSurvey.rational,
+                dateTakeFollowUp: new Date(fuSurvey.dateTaken)
+              };
               ret.followUpRow = fuSurvey.questionnaires.reduce((qacc, q, qidx) => {
                 return q.items.reduce((itemacc, item, itemindex) => {
                   itemacc[`followup-q-${qidx}/item-${itemindex}`] = item.answer;
                   return itemacc;
                 }, qacc);
-              }, {});
+              }, _acc);
             }
             return ret;
           }); // map
-
 
           // merge the 3 data sources into 1 row
           const rows = trios.map(t => {
@@ -84,7 +88,9 @@ router.get('/', function (req, res) {
             delete resultCopy._id;
             const rtnl = resultCopy.survey.rational;
             delete resultCopy.survey;
-            return { ...resultCopy, ...{ rational: rtnl }, ...t.initialRow, ...t.followUpRow };
+            return ({
+              ...resultCopy, ...{ rational: rtnl }, ...t.initialRow, ...t.followUpRow
+            });
           });
 
           const json2csvParser = new Json2csvParser();
@@ -95,7 +101,7 @@ router.get('/', function (req, res) {
           getById(s_id, theSurvey => {
 
             const { name } = theSurvey;
-            
+
             const filename = `results-${name}-${new Date(Date.now()).toJSON()}.csv`;
             res.setHeader('Content-disposition', `attachment; filename=${filename}`);
             res.setHeader('Content-type', 'text/plain');

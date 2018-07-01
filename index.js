@@ -22,12 +22,13 @@ const logger = require('./utils/logger');
 logger.info('started process');
 // mongodb service needs to be started beforehand
 // $ sudo service mongod start
-connectToDB(() => {
+connectToDB(process.env.DB_NAME, () => {
   registerAllFollowUpEmailJobs();
   const app = express();
 
   // Serve static files from the React app
   app.use(express.static(path.join(__dirname, 'client/build')));
+  app.disable('etag');
 
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());

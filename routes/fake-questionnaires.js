@@ -25,6 +25,7 @@ router.get('/:id', (req, res) => {
       const { answersPool, correctAnswersPool } = trickItem;
       trickItem.allAnswersShuffled = shuffle(answersPool.concat(correctAnswersPool));
     })
+    entity.trickitems = shuffle(entity.trickitems); // the order is not important as this trickitems do not end up in results
     res.json(entity);
   });
 });

@@ -74,6 +74,7 @@ exports.getByIdWithQs = (id, callback) => {
           questionaresIDsAndTypes: '$questionaresIDsAndTypes',
           followUpInfo: '$followUpInfo',
           instructions: '$instructions',
+          postInstructions: '$postInstructions',
         }
       },
       {
@@ -107,6 +108,7 @@ exports.getByIdWithQs = (id, callback) => {
           followUpInfo: { $first: '$followUpInfo' },
           allQuestionnaires: { $push: '$aqs' },
           instructions: { $first: '$instructions' },
+          postInstructions: { $first: '$postInstructions' },
         }
       }
     ]) // aggregate

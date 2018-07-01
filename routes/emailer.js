@@ -8,7 +8,8 @@ const {
   CLIENT_ID, CLIENT_SECRET,
   REDIRECT_URL, SURVEY_URL,
   refreshGmailTokens
- } = require('../utils/auth');
+} = require('../utils/auth');
+const { emailSubject, getEmailMessage } = require('../utils/emailContentProvider');
 const resultsRepo = require('../repos/results');
 const surveysRepo = require('../repos/surveys');
 const logger = require('../utils/logger');
@@ -30,8 +31,8 @@ exports.registerFollowUpEmailJob = (email, userId, followUpDate, currentServeyId
 
       const mailObject = {
         to: email,
-        subject: 'follow-up survey',
-        message: `Please follow the link to the next survey: ${SURVEY_URL}/${userId}/take-survey/${followUpSurveyId} .`
+        subject: emailSubject,
+        message: getEmailMessage(`${SURVEY_URL}/${userId}/take-survey/${followUpSurveyId}`),
       };
 
       const j = scheduleJob(followUpDate, function () {
